@@ -7,26 +7,59 @@ const execAsync = util.promisify(cp.exec);
 export function activate(context: vscode.ExtensionContext) {
     console.log('Git Sync Activated');
 
+    const statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    statusBarItem.text = "$(sync) Git Sync";
+    statusBarItem.tooltip = "Git Sync";
+    statusBarItem.command = 'git-sync.showMenu';
+
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders) {
         const rootPath = workspaceFolders[0].uri.fsPath;
         const config = vscode.workspace.getConfiguration('gitSync');
         
         if (config.get<boolean>('enabled')) {
+            statusBarItem.show();
             runAutoPull(rootPath);
+        } else {
+            statusBarItem.hide();
         }
+    } else {
+        statusBarItem.hide();
     }
+    
+    let menuDisposable = vscode.commands.registerCommand('git-sync.showMenu', async () => {
+        if (!checkEnabledAndWorkspace()) return;
+
+        const selection = await vscode.window.showQuickPick(
+            [
+                { label: 'Pull', description: 'Pull changes from remote' },
+                { label: 'Push', description: 'Push changes to remote' }
+            ],
+            { placeHolder: 'Select an action' }
+        );
+
+        if (!selection) return;
+
+        if (selection.label.includes('Pull')) {
+            vscode.commands.executeCommand('git-sync.pull');
+        } else if (selection.label.includes('Push')) {
+            vscode.commands.executeCommand('git-sync.commitPush');
+        }
+    });
 
     let pullDisposable = vscode.commands.registerCommand('git-sync.pull', async () => {
         if (!checkEnabledAndWorkspace()) return;
         const rootPath = vscode.workspace.workspaceFolders![0].uri.fsPath;
         
         try {
+            statusBarItem.text = "$(sync~spin) Git Pull";
             vscode.window.showInformationMessage('Git Sync: Pull');
             await execAsync('git pull', { cwd: rootPath });
             vscode.window.showInformationMessage('Git Sync: Pull Ok');
         } catch (error: any) {
             vscode.window.showErrorMessage('Git Sync: Err: ' + error.message);
+        } finally {
+            statusBarItem.text = "$(sync) Git Sync";
         }
     });
 
@@ -42,6 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
         if (customMessage === undefined) return;
 
         try {
+            statusBarItem.text = "$(sync~spin) Git Sync";
             vscode.window.showInformationMessage('Git Sync: Add');
             await execAsync('git add .', { cwd: rootPath });
 
@@ -58,10 +92,12 @@ export function activate(context: vscode.ExtensionContext) {
             vscode.window.showInformationMessage('Git Sync: Push Ok');
         } catch (error: any) {
             vscode.window.showErrorMessage('Git Sync: Err: ' + error.message);
+        } finally {
+            statusBarItem.text = "$(sync) Git Sync";
         }
     });
 
-    context.subscriptions.push(pullDisposable, commitPushDisposable);
+    context.subscriptions.push(statusBarItem, menuDisposable, pullDisposable, commitPushDisposable);
 }
 
 function checkEnabledAndWorkspace(): boolean {

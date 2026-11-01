@@ -5,7 +5,7 @@ import * as util from 'util';
 const execAsync = util.promisify(cp.exec);
 
 export function activate(context: vscode.ExtensionContext) {
-    console.log('Git Sync Local eklentisi aktifleşti.');
+    console.log('Git Sync Activated');
 
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if (workspaceFolders) {
@@ -22,11 +22,11 @@ export function activate(context: vscode.ExtensionContext) {
         const rootPath = vscode.workspace.workspaceFolders![0].uri.fsPath;
         
         try {
-            vscode.window.showInformationMessage('Git Sync: Uzaktaki değişiklikler çekiliyor...');
+            vscode.window.showInformationMessage('Git Sync: Pull');
             await execAsync('git pull', { cwd: rootPath });
-            vscode.window.showInformationMessage('✅ Git Sync: Pull işlemi başarılı!');
+            vscode.window.showInformationMessage('Git Sync: Pull Ok');
         } catch (error: any) {
-            vscode.window.showErrorMessage('❌ Git Sync Pull Hatası: ' + error.message);
+            vscode.window.showErrorMessage('Git Sync: Err: ' + error.message);
         }
     });
 

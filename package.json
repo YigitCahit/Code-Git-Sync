@@ -1,0 +1,48 @@
+{
+  "name": "code-git-sync",
+  "displayName": "Code Git Sync",
+  "description": "A plugin for Visual Studio Code that allows you to sync your projects with a Git repository.",
+  "version": "1.1.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "activationEvents": [
+    "workspaceContains:.git"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Git Sync Local",
+      "properties": {
+        "gitSync.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Bu depoda Git Sync eklentisini etkinleştir."
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "git-sync.pull",
+        "title": "Git Sync: Pull Yap"
+      },
+      {
+        "command": "git-sync.commitPush",
+        "title": "Git Sync: Commit & Push Yap"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^16.18.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^4.1.0",
+    "typescript": "^5.0.0"
+  }
+}

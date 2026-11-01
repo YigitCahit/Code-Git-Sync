@@ -1,0 +1,33 @@
+# Node modülleri
+node_modules/
+
+# TypeScript derleme çıktıları
+out/
+dist/
+
+# VS Code eklenti paketleri
+*.vsix
+
+# Editör ve IDE ayarları
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Log dosyaları ve npm önbellekleri
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.eslintcache
+
+# İşletim sistemi dosyaları
+.DS_Store
+Thumbs.db
